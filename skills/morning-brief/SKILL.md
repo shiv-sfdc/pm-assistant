@@ -1,6 +1,6 @@
 ---
 name: morning-brief
-description: Compile and send a personalized morning brief to Slack. Aggregates calendar, tasks, email highlights, Slack highlights, news, and competitive intelligence into a single daily digest. Use when setting up a daily standup summary, briefing for the day ahead, or a scheduled morning update.
+description: Compile and send a personalized morning brief to Slack. Aggregates calendar, tasks, email highlights, Slack highlights and news into a single daily digest. Use when setting up a daily standup summary, briefing for the day ahead, or a scheduled morning update.
 argument-hint: "[optional: focus areas or date override]"
 ---
 
@@ -81,10 +81,6 @@ Summarize each email in 1 line max — never quote full body. If Gmail is not co
 - Prioritize: direct @mentions > active threads with new replies > saved items > general discussions
 - **Include permalink URLs** from search results to make each Slack highlight clickable
 
-#### Competitive Intelligence
-- Check if a delta report was generated today: look for /Users/YOU/Documents/Work/CompetitiveAnalysis/competitive-delta-[TODAY'S DATE].md
-- If it exists and has 🔴 or 🟡 items, include a summary
-- If no delta file yet, skip this section
 
 #### News / Web
 - Search for top AI agent / enterprise software news from external sources (last 48 hours)
@@ -162,7 +158,7 @@ Send the composed brief as a Slack DM to U_REDACTED.
 ### 4. Confirm
 
 After sending, confirm to the user in the Claude Code terminal:
-"Morning brief sent to Slack ✓ — [N] meetings, [N] tasks, [N] emails ([N] need response), [N] Slack highlights, [competitive intel: yes/no], [N] news items."
+"Morning brief sent to Slack ✓ — [N] meetings, [N] tasks, [N] emails ([N] need response), [N] Slack highlights, [N] news items."
 
 ## Configuration
 
@@ -196,6 +192,6 @@ This will create a durable cron job that fires the skill each weekday morning.
 - If Slack search returns too many results, prioritize: direct @mentions > DMs > channels the user owns or manages > all others
 - Never include raw message content that looks sensitive — summarize rather than quote verbatim for long messages
 - The brief should surface decisions and prep needed, not just list events — add context where useful
-# If it's a weekend and there are no meetings or tasks, keep the brief short: news + competitive intel only
+# If it's a weekend and there are no meetings or tasks, keep the brief short: news
 - For email: prioritize 🔴 "must respond" (unreplied emails) over ℹ️ FYI — show unread unreplied first, then read unreplied, ordered by age (oldest first) — if there are more than 10, show the top 10 and truncate the rest with "…and [N] more"
 - To enable email: connect Google account in AI Expert Suite settings (must have Gmail API access)

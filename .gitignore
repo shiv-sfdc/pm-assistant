@@ -1,0 +1,37 @@
+# Claude Code internal files
+.DS_Store
+.last-cleanup
+.mcp.json
+agents/
+backups/
+cache/
+certs/
+commands/
+debug/
+file-history/
+history.jsonl
+ide/
+plugins/
+projects/
+scheduled_tasks.json
+scheduled_tasks.lock
+sessions/
+settings.json
+settings.json.backup.*
+settings.json.lock
+settings.local.json
+shell-snapshots/
+todos/
+
+# Python
+*.py
+__pycache__/
+*.pyc
+
+# Scripts
+push-to-both-repos.sh
+sync-to-shivramanna.sh
+sync-both-repos.sh
+
+# Misc
+SCRIPT_INSTRUCTIONS.md

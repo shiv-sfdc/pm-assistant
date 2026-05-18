@@ -85,6 +85,7 @@ Questions that need answers:
 ### 3. Format Each Insight
 
 For each insight, include:
+- **Product area**: `*[Product Area]*` at the start in bold to identify the Agentforce product area (e.g., Multi-Agent Orchestration, Testing Center, Retrievers, Voice, Copilot, Agent Builder, Observability, Data Cloud, Connectors, etc.)
 - **Channel tag**: `[#channel-name]` to show source
 - **Category indicator**: Emoji to signal type
   - 🔴 Critical/Blocker
@@ -99,7 +100,7 @@ For each insight, include:
 
 **Example format:**
 ```
-• 🔴 [#af-multi-agent-orchestration] <https://salesforce.slack.com/...|Customer blocked on agent handoff timeout> — Acme Corp hitting 30s timeout when orchestrating 5+ agents; no clear workaround _(updated: eng team investigating)_
+• 🔴 *Multi-Agent Orchestration* [#af-multi-agent-orchestration] <https://salesforce.slack.com/...|Customer blocked on agent handoff timeout> — Acme Corp hitting 30s timeout when orchestrating 5+ agents; no clear workaround _(updated: eng team investigating)_
 ```
 
 ### 4. Compose the Slack Message
@@ -115,9 +116,9 @@ Structure the Slack DM as follows. Use Slack markdown (*bold*, _italic_, bullet 
 
 💡 *Customer Feedback & Learning* ([N] insights)
 
-• 🔴 [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context]
-• 🟡 [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context]
-• 🟢 [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context] _(updated: [new info])_
+• 🔴 *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context]
+• 🟡 *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context]
+• 🟢 *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context] _(updated: [new info])_
 • [continue up to 10 items]
 
 > [N] total insights from [N] channels · Covering last 48 hours
@@ -126,8 +127,8 @@ Structure the Slack DM as follows. Use Slack markdown (*bold*, _italic_, bullet 
 
 ❓ *Open Questions* ([N] questions)
 
-• [#channel] <[SLACK_PERMALINK]|[Question summary]> — [Context about who's asking and why] _(awaiting response)_
-• [#channel] <[SLACK_PERMALINK]|[Question summary]> — [Context about who's asking and why]
+• *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Question summary]> — [Context about who's asking and why] _(awaiting response)_
+• *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Question summary]> — [Context about who's asking and why]
 • [continue up to 10 items]
 
 > [N] questions need answers · [N] customer-blocking
@@ -173,6 +174,7 @@ This will create a durable cron job that fires the skill each weekday morning.
 
 ## Tips
 
+- **Product area identification**: Identify the specific Agentforce product area for each insight (Multi-Agent Orchestration, Testing Center, Retrievers, Voice, Copilot, Agent Builder, Observability, Data Cloud, Connectors, Query Records, Agent Script, Runtime & Reasoning, etc.). If unclear, infer from context or use "General"
 - Prioritize insights that are actionable or change our understanding
 - Skip routine status updates or process messages unless they contain real customer insight
 - When threads have new replies, check if they resolve the issue or add meaningful context

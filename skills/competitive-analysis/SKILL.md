@@ -90,7 +90,7 @@ After generating the brief:
 - Offer to create a one-page summary for executives
 - Offer to create sales battle cards for competitive deals
 - Offer to draft a "how to win against [competitor]" guide
-- Offer to set up a monitoring plan for competitive moves
+- **Offer to set up ongoing monitoring**: Suggest using `/daily-competitive-insights` to track changes and updates to this competitive landscape over time
 
 ## Competitive Landscape Mapping
 

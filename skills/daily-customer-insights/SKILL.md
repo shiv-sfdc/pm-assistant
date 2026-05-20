@@ -148,10 +148,32 @@ _• #your-customer-channel-4_
 
 Send the composed insights digest as a Slack DM to U_REDACTED.
 
+<!--
+### 6. Send Email
+
+TEMPORARILY DISABLED - SMTP configuration blocked by Google Workspace 2FA restrictions.
+To re-enable: Contact Salesforce IT for SMTP relay configuration or enable app passwords.
+
+Convert the Slack-formatted digest to plain text and send via email:
+
+```bash
+python3 /Users/YOU/.claude/scripts/send_email.py \
+  --to "your.email@example.com" \
+  --subject "Daily Customer Insights — [WEEKDAY], [DATE]" \
+  --body "[Plain text version of insights digest]"
+```
+
+**Plain text format**:
+- Remove Slack markdown and convert links
+- Preserve structure: headers, emoji indicators, bullets
+- Include all insights and open questions
+- Add channel list at bottom
+-->
+
 ### 6. Confirm
 
-After sending, confirm to the user in the Claude Code terminal:
-"Daily customer insights sent to Slack ✓ — [N] feedback/learnings, [N] open questions from [N] channels."
+After sending Slack DM, confirm to the user in the Claude Code terminal:
+"Daily customer insights sent ✓ — Slack DM — [N] feedback/learnings, [N] open questions from [N] channels."
 
 ## Configuration
 

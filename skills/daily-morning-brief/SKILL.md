@@ -1,19 +1,19 @@
 ---
-name: morning-brief
+name: daily-morning-brief
 description: Compile and send a personalized morning brief to Slack. Aggregates calendar, tasks, email highlights, Slack highlights and news into a single daily digest. Use when setting up a daily standup summary, briefing for the day ahead, or a scheduled morning update.
 argument-hint: "[optional: focus areas or date override]"
 ---
 
-# Morning Brief
+# Daily Morning Brief
 
 > Compile a personalized morning brief and send it to Slack as a DM.
 
 ## Usage
 
 ```
-/morning-brief
-/morning-brief focus: product strategy
-/morning-brief 2026-05-14
+/daily-morning-brief
+/daily-morning-brief focus: product strategy
+/daily-morning-brief 2026-05-14
 ```
 
 ## Workflow
@@ -155,10 +155,32 @@ _Have a great day_ 🚀
 
 Send the composed brief as a Slack DM to U_REDACTED.
 
+<!--
+### 4. Send Email
+
+TEMPORARILY DISABLED - SMTP configuration blocked by Google Workspace 2FA restrictions.
+To re-enable: Contact Salesforce IT for SMTP relay configuration or enable app passwords.
+
+Convert the Slack-formatted message to plain text (remove Slack markdown) and send via email:
+
+```bash
+python3 /Users/YOU/.claude/scripts/send_email.py \
+  --to "your.email@example.com" \
+  --subject "Morning Brief — [WEEKDAY], [DATE]" \
+  --body "[Plain text version of the brief]"
+```
+
+**Plain text format** (convert from Slack format):
+- Remove Slack markdown (*bold* → plain, _italic_ → plain)
+- Convert Slack links `<URL|text>` → `text: URL`
+- Keep structure: headers, bullets, sections
+- Include all sections: Calendar, Tasks, Email, Slack, News
+-->
+
 ### 4. Confirm
 
-After sending, confirm to the user in the Claude Code terminal:
-"Morning brief sent to Slack ✓ — [N] meetings, [N] tasks, [N] emails ([N] need response), [N] Slack highlights, [N] news items."
+After sending Slack DM, confirm to the user in the Claude Code terminal:
+"Morning brief sent ✓ — Slack DM — [N] meetings, [N] tasks, [N] emails ([N] need response), [N] Slack highlights, [N] news items."
 
 ## Configuration
 
@@ -182,7 +204,7 @@ These defaults can be overridden by the user at invocation time:
 ## Scheduling
 
 To run this automatically every morning, ask Claude Code:
-> "Schedule morning-brief daily at 7:30 AM"
+> "Schedule daily-morning-brief daily at 7:30 AM"
 
 This will create a durable cron job that fires the skill each weekday morning.
 

@@ -1,7 +1,7 @@
 ---
 name: daily-competitive-insights
 description: Monitor a competitive landscape report for changes and updates. Searches for news/announcements from tracked competitors, generates delta reports, updates baseline artifacts (MD/PDF/PPTX/Keynote), and sends notifications. Use for ongoing competitive intelligence monitoring after creating an initial baseline with /competitive-analysis.
-argument-hint: "<baseline-file-path> [slack-user-id]"
+argument-hint: "[baseline-file-path] [slack-user-id]"
 ---
 
 # Daily Competitive Insights
@@ -11,12 +11,24 @@ argument-hint: "<baseline-file-path> [slack-user-id]"
 ## Usage
 
 ```
-/daily-competitive-insights <baseline-file-path> [slack-user-id]
+/daily-competitive-insights
+/daily-competitive-insights <baseline-file-path>
+/daily-competitive-insights <baseline-file-path> <slack-user-id>
 ```
 
+## Configuration
+
+Before doing any work, read `~/.claude/skills/config.json` and extract:
+- `user.slack_user_id` — default Slack DM recipient
+- `user.email` / `paths.send_email_script` — for email delivery (when SMTP enabled)
+- `daily_competitive_insights.default_baseline_path` — used when no baseline path is passed as argument
+- `daily_competitive_insights.research_lookback_hours` — default 48
+
+If `config.json` is missing, error out: "Missing ~/.claude/skills/config.json. Copy config.example.json and fill in your values."
+
 **Arguments**:
-- `baseline-file-path`: Path to the markdown file containing your competitive analysis baseline (required)
-- `slack-user-id`: Slack user ID to send notifications to (optional, defaults to current user U_REDACTED)
+- `baseline-file-path`: Path to the markdown file containing your competitive analysis baseline. If omitted, uses `{{config.daily_competitive_insights.default_baseline_path}}`.
+- `slack-user-id`: Slack user ID to send notifications to. If omitted, uses `{{config.user.slack_user_id}}`.
 
 ## When to Use This Skill
 
@@ -39,7 +51,7 @@ Extract the list of competitors from the baseline (typically from a "Competitive
 
 ### 2. Research Competitor Updates
 
-Search for news from the **last 24-48 hours** (or since last run) on each tracked competitor:
+Search for news from the last `{{config.daily_competitive_insights.research_lookback_hours}}` hours (or since last run) on each tracked competitor:
 
 **Research sources**:
 - Competitor company blogs and newsrooms
@@ -156,7 +168,7 @@ If PPTX or Keynote files exist (same base path with `.pptx` or `.key` extensions
 
 ### 5. Send Slack Notification
 
-Send a Slack DM to the specified user (or default to U_REDACTED).
+Send a Slack DM to the specified user (or default to `{{config.user.slack_user_id}}`).
 
 **If there were 🔴 or 🟡 updates**:
 
@@ -183,26 +195,26 @@ Send a brief summary:
 ### 6. Send Email
 
 TEMPORARILY DISABLED - SMTP configuration blocked by Google Workspace 2FA restrictions.
-To re-enable: Contact Salesforce IT for SMTP relay configuration or enable app passwords.
+To re-enable: configure SMTP relay or enable app passwords.
 
 Send email via Python script:
 
 **If there were 🔴 or 🟡 updates**:
 
 ```bash
-python3 /Users/YOU/.claude/scripts/send_email.py \
-  --to "your.email@example.com" \
+python3 {{config.paths.send_email_script}} \
+  --to "{{config.user.email}}" \
   --subject "Competitive Intelligence Delta — [TODAY'S DATE]" \
   --body "[Plain text version of delta report]" \
   --attach "[path-to]/competitive-delta-[YYYY-MM-DD].md" \
-  --attach "[path-to]/competitive-analysis-multiagent-exec-summary.pdf"
+  --attach "[baseline-path].pdf"
 ```
 
 **If there were NO 🔴 or 🟡 updates**:
 
 ```bash
-python3 /Users/YOU/.claude/scripts/send_email.py \
-  --to "your.email@example.com" \
+python3 {{config.paths.send_email_script}} \
+  --to "{{config.user.email}}" \
   --subject "Competitive Intelligence Delta — [TODAY'S DATE]" \
   --body "No meaningful changes today across [list competitors]. Baseline report unchanged."
 ```
@@ -281,14 +293,17 @@ prompt: [full skill invocation with parameters]
 ## Example Invocation
 
 ```bash
-# One-time run
-/daily-competitive-insights ~/Documents/Work/competitive-analysis-multiagent-exec-summary.md
+# Use default baseline + Slack recipient from config.json
+/daily-competitive-insights
 
-# With custom Slack user
-/daily-competitive-insights ~/Documents/Work/competitive-analysis-multiagent-exec-summary.md U_REDACTED
+# Override the baseline path
+/daily-competitive-insights ~/Documents/Work/some-other-baseline.md
 
-# Set up daily monitoring
-"Set up daily competitive insights monitoring for ~/Documents/Work/competitive-analysis-multiagent-exec-summary.md, running every morning at 8:30 AM"
+# Override both baseline and Slack recipient
+/daily-competitive-insights ~/Documents/Work/some-other-baseline.md U1234567890
+
+# Set up daily monitoring (uses defaults from config.json)
+"Set up daily competitive insights monitoring, running every morning at 8:30 AM"
 ```
 
 ## Output Files

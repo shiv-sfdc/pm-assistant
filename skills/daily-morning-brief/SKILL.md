@@ -18,6 +18,25 @@ argument-hint: "[optional: focus areas or date override]"
 
 ## Workflow
 
+### 0. Load Configuration
+
+Before doing any work, read `~/.claude/skills/config.json` and extract:
+- `user.slack_user_id` — Slack DM recipient
+- `user.slack_handle` — used to find @-mentions
+- `user.display_name` — used in greeting line
+- `user.email` / `paths.send_email_script` — for email delivery (when SMTP enabled)
+- `daily_morning_brief.news_topics` — relevance filter for news
+- `daily_morning_brief.news_search_queries` — Google News query strings
+- `daily_morning_brief.news_lookback_hours` — default 48
+- `daily_morning_brief.max_news_items` — default 5
+- `daily_morning_brief.email_lookback_hours` — default 96
+- `daily_morning_brief.max_email_highlights` — default 10
+- `daily_morning_brief.slack_lookback_hours` — default 48
+
+If `config.json` is missing, error out: "Missing ~/.claude/skills/config.json. Copy config.example.json and fill in your values."
+
+References to `{{config.X}}` in this document mean: substitute the value loaded from config.json.
+
 ### 1. Gather Inputs (run in parallel)
 
 Collect from all available sources simultaneously:
@@ -36,8 +55,8 @@ Collect from all available sources simultaneously:
 Use Gmail MCP plugin to fetch emails (requires Google to be connected via AI Expert Suite):
 
 **Search strategy:**
-1. Search for unread messages in inbox from last 96 hours: `query="is:unread in:inbox newer_than:4d" max_results=20`
-2. Search for recent inbox messages (read or unread) from last 96 hours: `query="in:inbox newer_than:4d" max_results=30`
+1. Search for unread messages in inbox from last `{{config.daily_morning_brief.email_lookback_hours}}` hours: `query="is:unread in:inbox newer_than:Xd" max_results=20` (X = email_lookback_hours / 24)
+2. Search for recent inbox messages (read or unread) from same window: `query="in:inbox newer_than:Xd" max_results=30`
    - Includes emails from yourself (self-sent reminders)
    - Searches across all Gmail categories (primary, social, promotions, personal, etc.)
 3. For each message, check if it's likely a thread you've replied to by searching for your replies in that conversation
@@ -61,7 +80,7 @@ Use Gmail MCP plugin to fetch emails (requires Google to be connected via AI Exp
   - Non-self-sent messages you've already replied to
 
 **Priority order:**
-1. Unread unreplied messages (oldest first within last 96 hours)
+1. Unread unreplied messages (oldest first within the email lookback window)
 2. Read unreplied messages that need action (oldest first)
 3. Show age of message (e.g., "3 days old") for items > 24 hours
 
@@ -73,28 +92,28 @@ Use Gmail MCP plugin to fetch emails (requires Google to be connected via AI Exp
 Summarize each email in 1 line max — never quote full body. If Gmail is not connected, note "Email unavailable — Gmail not connected in AI Expert Suite" and skip the section.
 
 #### Slack Highlights
-- Search for unread mentions (@your.handle) from the past 48 hours
-- Search for threads where you've participated and there have been new replies in the last 48 hours (use `from:me` to find your messages, then check for newer replies in those threads)
+- Search for unread mentions (`@{{config.user.slack_handle}}`) from the past `{{config.daily_morning_brief.slack_lookback_hours}}` hours
+- Search for threads where you've participated and there have been new replies in the same window (use `from:me` to find your messages, then check for newer replies in those threads)
 - Search for messages in key channels that need a response
-- Search for saved messages from the past 48 hours
+- Search for saved messages from the past lookback window
 - Surface any urgent threads or decisions pending
 - Prioritize: direct @mentions > active threads with new replies > saved items > general discussions
 - **Include permalink URLs** from search results to make each Slack highlight clickable
 
 
 #### News / Web
-- Search for top AI agent / enterprise software news from external sources (last 48 hours)
-- Filter for relevance to: Agentforce, Claude, Gemini, OpenAI, AI Agents, ServiceNow Agent Assist, Anthropic
-- Max 5 items — signal only, no filler
+- Search for top AI agent / enterprise software news from external sources (last `{{config.daily_morning_brief.news_lookback_hours}}` hours)
+- Filter for relevance to topics in `{{config.daily_morning_brief.news_topics}}`
+- Max `{{config.daily_morning_brief.max_news_items}}` items — signal only, no filler
 - **Search strategy:**
   - Use Google News RSS feeds via curl: `https://news.google.com/rss/search?q=QUERY+when:2d&hl=en-US&gl=US&ceid=US:en`
-  - Search queries: "Claude AI", "Anthropic", "OpenAI", "Google Gemini", "AI agents", "Agentforce Salesforce", "ServiceNow Agent"
+  - Use the search queries from `{{config.daily_morning_brief.news_search_queries}}`
   - Parse RSS XML to extract: title, link, pubDate, source
   - Filter by relevance and deduplicate across queries
   - Prioritize: product launches, major features, partnerships, research papers, competitive moves
   - Skip: opinion pieces, minor updates, marketing fluff
   - For each item: `<[URL]|[Source] — [Headline]>: [1-line summary]`
-  - If no relevant news found, note "No significant news in the last 48 hours"
+  - If no relevant news found, note "No significant news in the lookback window"
 
 ### 2. Compose the Brief
 
@@ -103,7 +122,7 @@ Structure the Slack DM as follows. Use Slack markdown (*bold*, _italic_, bullet 
 ---
 
 ```
-🌅 *Good morning, Shiv — [WEEKDAY], [DATE]*
+🌅 *Good morning, [config.user.display_name] — [WEEKDAY], [DATE]*
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -153,19 +172,19 @@ _Have a great day_ 🚀
 
 ### 3. Send the DM
 
-Send the composed brief as a Slack DM to U_REDACTED.
+Send the composed brief as a Slack DM to `{{config.user.slack_user_id}}`.
 
 <!--
 ### 4. Send Email
 
 TEMPORARILY DISABLED - SMTP configuration blocked by Google Workspace 2FA restrictions.
-To re-enable: Contact Salesforce IT for SMTP relay configuration or enable app passwords.
+To re-enable: configure SMTP relay or enable app passwords.
 
 Convert the Slack-formatted message to plain text (remove Slack markdown) and send via email:
 
 ```bash
-python3 /Users/YOU/.claude/scripts/send_email.py \
-  --to "your.email@example.com" \
+python3 {{config.paths.send_email_script}} \
+  --to "{{config.user.email}}" \
   --subject "Morning Brief — [WEEKDAY], [DATE]" \
   --body "[Plain text version of the brief]"
 ```
@@ -184,22 +203,21 @@ After sending Slack DM, confirm to the user in the Claude Code terminal:
 
 ## Configuration
 
-These defaults can be overridden by the user at invocation time:
+All defaults are loaded from `~/.claude/skills/config.json`. To change recipient, news topics, lookback windows, etc., edit that file.
 
-| Setting | Default |
+| Setting | Config key |
 |---|---|
-| Slack recipient | U_REDACTED (Shiv Ramanna) |
-| Calendar lookahead | Today only |
-| Slack lookback | 48 hours |
-| Slack criteria | Direct @mentions, threads you've participated in with new replies, saved messages, key channel discussions |
-| News topics | Agentforce, Claude, Gemini, OpenAI, AI Agents, ServiceNow Agent Assist, Anthropic |
-| News timeframe | 48 hours |
-| News sources | External web search (news sites, blogs, official announcements) |
-| Max news items | 5 |
-| Email lookback | 96 hours |
-| Email source | Gmail via MCP plugin (requires Google connected in AI Expert Suite) |
-| Email criteria | Unreplied emails from last 96 hours (unread prioritized first) |
-| Max email highlights | 10 (🔴 must-respond first, then ℹ️ FYI) |
+| Slack recipient | `user.slack_user_id` |
+| Slack handle (for @-mentions) | `user.slack_handle` |
+| Display name (greeting) | `user.display_name` |
+| Email recipient | `user.email` |
+| News topics | `daily_morning_brief.news_topics` |
+| News search queries | `daily_morning_brief.news_search_queries` |
+| News lookback | `daily_morning_brief.news_lookback_hours` |
+| Max news items | `daily_morning_brief.max_news_items` |
+| Email lookback | `daily_morning_brief.email_lookback_hours` |
+| Max email highlights | `daily_morning_brief.max_email_highlights` |
+| Slack lookback | `daily_morning_brief.slack_lookback_hours` |
 
 ## Scheduling
 

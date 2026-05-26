@@ -4,231 +4,43 @@ A collection of Claude Code skills that automate your daily information gatherin
 
 ---
 
-## 📋 Available Skills
-
-### 🌅 daily-morning-brief
-
-**Your personalized daily standup in one message.**
-
-Automatically compiles and sends a morning brief with:
-- **Today's calendar** - All meetings with attendee counts and back-to-back warnings
-- **Tasks due today** - From Google Tasks, including overdue items
-- **Email highlights** - Unreplied emails needing your attention (from last 96 hours)
-- **Slack highlights** - @mentions, threads you're in with new replies
-- **AI & Enterprise news** - Latest from Anthropic, OpenAI, Google Gemini, AI agents space
-
-**Use case**: Start your day knowing exactly what's ahead without checking 5 different apps.
-
-**Example output:**
-```
-🌅 Good morning, Shiv — Monday, May 19, 2026
-
-📅 Today's Calendar (13 meetings)
-• 9:00 AM - 9:30 AM — Unified Conversational API SoS (48 people)
-• 9:30 AM - 10:00 AM — SOMA Beta - SoS (76 people)
-⚠️ Back-to-back meetings throughout the day
-
-💬 Slack Highlights
-• @mentioned in #team-channel by Alice: "Need your input on the API design"
-• New reply in thread you're in: #eng-standup — "Deployment completed"
-
-🌐 AI & Enterprise News
-• KPMG integrates Claude across 276,000+ workforce (Anthropic, May 20)
-• OpenAI co-founder Andrej Karpathy joins Anthropic (Axios, May 19)
-```
-
-**How to use:**
-```bash
-# Run once manually
-/daily-morning-brief
-
-# Schedule to run daily at 7:30 AM
-"Schedule daily-morning-brief at 7:30 AM"
-```
-
----
-
-### 📊 daily-customer-insights
-
-**Stay on top of customer feedback without drowning in Slack.**
-
-Monitors specified Slack channels and extracts:
-- **🔴 Critical/Blocker feedback** - Issues needing immediate attention
-- **🟡 Important feedback** - Feature requests and pain points
-- **🟢 Learnings/Success** - What's working well for customers
-- **❓ Open questions** - Customer questions awaiting answers
-
-Organized by product area (Multi-Agent Orchestration, Testing Center, Retrievers, etc.)
-
-**Use case**: Product managers can review a day's worth of customer feedback in 2 minutes instead of scrolling through dozens of Slack channels.
-
-**Example output:**
-```
-📊 Daily Customer Insights — Monday, May 19, 2026
-
-💡 Customer Feedback & Learning (8 insights)
-
-• 🔴 Multi-Agent Orchestration [#af-multi-agent] 
-  Customer blocked on agent handoff timeout — Acme Corp hitting 30s 
-  timeout when orchestrating 5+ agents; no clear workaround
-
-• 🟡 Testing Center [#agentforce-fde] 
-  Request for bulk test execution — Multiple customers asking for ability 
-  to run 100+ test cases in parallel
-
-• 🟢 Retrievers [#ri-insights] 
-  Success: Auto-chunking working well — Beta customer reports 90% 
-  accuracy improvement after switching to auto-chunking
-
-❓ Open Questions (3 questions)
-
-• Multi-Agent Orchestration [#af-multi-agent] 
-  Can we configure retry logic per agent? — Enterprise customer planning 
-  migration, needs this clarified before commit
-```
-
-**How to use:**
-```bash
-# Run once manually
-/daily-customer-insights
-
-# Schedule to run daily at 7:30 AM
-"Schedule daily-customer-insights at 7:30 AM"
-```
-
----
-
-### 🔍 daily-competitive-insights
-
-**Automated competitive intelligence monitoring.**
-
-Monitors a baseline competitive analysis for changes:
-- Searches web for competitor announcements (last 24-48 hours)
-- Classifies updates: 🔴 High-signal / 🟡 Notable / ⚪ No change
-- Generates dated delta reports
-- Updates baseline artifacts (MD/PDF/PPTX) when changes occur
-- Sends Slack DM with summary
-
-**Use case**: Keep your competitive analysis current without manual research. Know immediately when competitors launch features, change pricing, or announce partnerships.
-
-**Example output:**
-```
-🔍 Competitive Intelligence Delta — May 19, 2026
-
-🟡 NOTABLE DEVELOPMENTS
-
-LangChain — LangSmith Engine Technical Deep-Dive (May 19)
-• Published technical follow-up to May 13 announcement
-• Signals sustained engineering investment in automated agent improvement
-• Threat: Reinforces production-readiness narrative
-
-OpenAI — Guaranteed Capacity offering (May 19)  
-• Enterprise pricing/capacity commitment model for API customers
-• Implications: Reduces friction for large enterprise deployments
-
-⚪ NO MEANINGFUL CHANGE
-• ServiceNow, Microsoft Copilot Studio (no verified news in 24 hours)
-
-✅ Updated files: baseline.md, baseline.pdf (regenerated)
-```
-
-**How to use:**
-```bash
-# First: Create baseline with /competitive-analysis skill
-/competitive-analysis competitors: LangChain, Microsoft Copilot Studio, OpenAI
-
-# Then: Monitor for changes
-/daily-competitive-insights ~/path/to/competitive-analysis.md
-
-# Schedule daily monitoring
-"Set up daily competitive insights monitoring for ~/path/to/baseline.md at 8:30 AM"
-```
-
----
-
-### 🏢 customer-analysis
-
-**Deep-dive customer account analysis on demand.**
-
-Comprehensive research across all available data sources:
-- **Slack**: Mentions, threads, channel activity (last 180 days)
-- **Gmail**: Email threads, meeting invites
-- **Google Docs**: Meeting notes, shared documents
-- **Calendar**: Past and upcoming meetings with this customer
-- **External web**: Company news, funding, press releases
-- **Product usage**: Based on discussions and support tickets
-
-Outputs: Executive summary, account health, contact mapping, issues, feedback, strategic insights, full chronological timeline.
-
-**Use case**: Before a customer meeting, get a complete picture of the relationship. For account reviews, have all context in one place. For escalations, understand the full history instantly.
-
-**Example output:**
-```
-# Customer Analysis: Acme Corporation
-*Generated: May 19, 2026 | Focus: Agentforce*
-
-## Executive Summary
-- **Account Health**: 🟡 At Risk (recent escalation on multi-agent timeout issues)
-- **Primary Use Case**: Multi-agent orchestration for customer service automation
-- **Key Contacts**: Jane Doe (VP Eng), John Smith (Tech Lead)
-- **Recent Activity**: 47 Slack mentions, 12 email threads, 3 meetings in last 90 days
-- **Critical Issues**: 1 P0 (30s timeout), 2 P1s (observability gaps)
-
-## Recent Feedback
-🔴 May 18: "Hitting 30s timeout with 5+ agents - blocking production rollout"
-🟡 May 15: "Need better error messages in agent handoff failures"  
-🟢 May 10: "Auto-chunking working great, 90% accuracy improvement"
-
-## Strategic Insights
-- Heavy investment in agentic architecture (5 engineers dedicated)
-- Considering competitive options if timeout issue not resolved by June
-- Strong advocate internally - CTO presented at their all-hands
-
-[... full timeline, contact details, meeting notes ...]
-```
-
-**How to use:**
-```bash
-# Run on demand
-/customer-analysis
-
-# Claude will prompt you for:
-# - Customer name
-# - Product focus area (optional)
-
-# Example:
-"Run customer analysis for Acme Corporation, focus on Agentforce"
-```
-
----
-
 ## 🚀 Quick Setup (5 minutes)
 
-### 1. Configure Your Settings
+### Step 1 — Create your `config.json`
 
-Add these to `~/.claude/settings.json` under the `"env"` section:
+This skill bundle ships with a single configuration file that holds your Slack ID, email, channel list, news topics, baseline paths, etc. Your real `config.json` is **gitignored** — only the sanitized example file is committed.
 
-```json
-{
-  "env": {
-    "SKILLS_USER_EMAIL": "your.email@company.com",
-    "SKILLS_SLACK_USER_ID": "YOUR_SLACK_USER_ID",
-    "SKILLS_CUSTOMER_INSIGHT_CHANNELS": "#channel1,#channel2,#channel3"
-  }
-}
+```bash
+# From the skills directory:
+cp config.example.json config.json
 ```
 
-**Finding your values:**
+Then open `config.json` and replace every fictional value (the example uses a fictional "Jane Doe" at "Acme AI" working on a product called "Pulse") with your own.
 
-| Config | How to Find It |
-|--------|----------------|
-| **SKILLS_USER_EMAIL** | Your work email address |
-| **SKILLS_SLACK_USER_ID** | Slack → Your profile → ⋯ → Copy member ID (e.g., `U_REDACTED`) |
-| **SKILLS_CUSTOMER_INSIGHT_CHANNELS** | Comma-separated Slack channels to monitor (e.g., `#customer-feedback,#support-escalations`) |
+**Required fields:**
 
-### 2. Grant Permissions
+| Field | Description | How to find it |
+|---|---|---|
+| `user.email` | Your work email | — |
+| `user.slack_user_id` | Your Slack member ID | Slack → profile → ⋯ → Copy member ID. Format: `U` + 10 alphanumeric chars |
+| `user.slack_handle` | Your Slack handle (no `@`) | Used to find @-mentions of you |
+| `user.display_name` | Your first name (used in greetings) | — |
+| `paths.competitive_baseline_dir` | Where competitive analysis files live | Folder where you keep `competitive-*.md` baselines |
+| `paths.customer_analysis_output_dir` | Where customer-analysis reports get saved | Folder for per-account deep-dives |
+| `daily_customer_insights.channels` | Slack channels to monitor for customer feedback | Comma-separated channel names with `#` |
+| `daily_customer_insights.domain` | Your product/business domain (used in skill phrasing) | e.g., "YourProduct" |
+| `daily_customer_insights.product_areas` | Tags used to categorize insights | List of feature areas |
+| `daily_morning_brief.news_topics` | Topics to filter news by | Your products + competitors |
+| `daily_morning_brief.news_search_queries` | Google News query strings | Phrases to actually pass to news search |
+| `daily_competitive_insights.default_baseline_path` | Baseline used when no path argument is passed | Full path to your main competitive analysis MD |
 
-First time you run each skill, you'll be prompted to allow:
+For the full schema and what each setting controls, see [`CONFIGURATION_GUIDE.md`](CONFIGURATION_GUIDE.md).
+
+> ⚠️ **Do not commit `config.json`.** It's already in `.gitignore`, but if you fork this repo, double-check by running `git status` and confirming `config.json` does not appear. Only `config.example.json` should be tracked.
+
+### Step 2 — Grant Permissions
+
+The first time you run each skill, you'll be prompted to allow:
 - ✅ Google Calendar access
 - ✅ Google Tasks access
 - ✅ Gmail search (for email highlights)
@@ -237,7 +49,7 @@ First time you run each skill, you'll be prompted to allow:
 
 Approve once and they're saved automatically.
 
-**Optional: Auto-approve all** (add to `settings.json`):
+**Optional: Auto-approve all** (add to `~/.claude/settings.json`):
 
 ```json
 {
@@ -255,7 +67,7 @@ Approve once and they're saved automatically.
 }
 ```
 
-### 3. Schedule Your Daily Briefs
+### Step 3 — Schedule Your Daily Briefs
 
 ```bash
 # Morning brief at 7:30 AM
@@ -270,109 +82,193 @@ Approve once and they're saved automatically.
 
 Done! You'll now receive daily automation without lifting a finger.
 
+> Cron jobs auto-expire after 7 days. Each scheduled skill will also schedule a one-shot reminder to renew it.
+
+---
+
+## 📋 Available Skills
+
+### 🌅 daily-morning-brief
+
+**Your personalized daily standup in one message.**
+
+Automatically compiles and sends a morning brief with:
+- **Today's calendar** — All meetings with attendee counts and back-to-back warnings
+- **Tasks due today** — From Google Tasks, including overdue items
+- **Email highlights** — Unreplied emails needing your attention (configurable lookback)
+- **Slack highlights** — @mentions, threads you're in with new replies
+- **News** — Filtered by topics from `config.daily_morning_brief.news_topics`
+
+**Use case**: Start your day knowing exactly what's ahead without checking 5 different apps.
+
+```bash
+/daily-morning-brief
+"Schedule daily-morning-brief at 7:30 AM"
+```
+
+---
+
+### 📊 daily-customer-insights
+
+**Stay on top of customer feedback without drowning in Slack.**
+
+Monitors the channels listed in `config.daily_customer_insights.channels` and extracts:
+- **🔴 Critical/Blocker feedback** — Issues needing immediate attention
+- **🟡 Important feedback** — Feature requests and pain points
+- **🟢 Learnings/Success** — What's working well for customers
+- **❓ Open questions** — Customer questions awaiting answers
+
+Organized by product area (configurable in `config.daily_customer_insights.product_areas`).
+
+**Use case**: Product managers can review a day's worth of customer feedback in 2 minutes instead of scrolling through dozens of Slack channels.
+
+```bash
+/daily-customer-insights
+"Schedule daily-customer-insights at 7:30 AM"
+```
+
+---
+
+### 🔍 daily-competitive-insights
+
+**Automated competitive intelligence monitoring.**
+
+Monitors a baseline competitive analysis for changes:
+- Searches web for competitor announcements (configurable lookback)
+- Classifies updates: 🔴 High-signal / 🟡 Notable / ⚪ No change
+- Generates dated delta reports
+- Updates baseline artifacts (MD/PDF/PPTX) when changes occur
+- Sends Slack DM with summary
+
+**Use case**: Keep your competitive analysis current without manual research. Know immediately when competitors launch features, change pricing, or announce partnerships.
+
+```bash
+# First: Create baseline with /competitive-analysis skill
+/competitive-analysis competitors: CompetitorA, CompetitorB
+
+# Then: Monitor for changes (uses default_baseline_path from config.json)
+/daily-competitive-insights
+
+# Or override the baseline
+/daily-competitive-insights ~/path/to/another-baseline.md
+
+# Schedule daily monitoring
+"Schedule daily-competitive-insights at 8:30 AM"
+```
+
+---
+
+### 🏢 customer-analysis
+
+**Deep-dive customer account analysis on demand.**
+
+Comprehensive research across all available data sources:
+- **Slack**: Mentions, threads, channel activity (last 180 days)
+- **Gmail**: Email threads, meeting invites
+- **Google Docs**: Meeting notes, shared documents
+- **Calendar**: Past and upcoming meetings with this customer
+- **External web**: Company news, funding, press releases
+
+Output saved to `config.paths.customer_analysis_output_dir`.
+
+**Use case**: Before a customer meeting, get a complete picture of the relationship. For account reviews, have all context in one place. For escalations, understand the full history instantly.
+
+```bash
+/customer-analysis "Acme Corporation"
+# Claude will prompt you for product focus area
+```
+
+---
+
+### 📈 competitive-analysis
+
+**One-time competitive landscape research.** Use to create the initial baseline that `daily-competitive-insights` then monitors. Parameter-driven; does not currently read `config.json`.
+
+```bash
+/competitive-analysis competitors: CompetitorA, CompetitorB
+/competitive-analysis feature-area: agent-orchestration
+```
+
 ---
 
 ## 🔒 Sharing These Skills (Git Setup)
 
-If you're publishing these skills to a public repository, **remove proprietary information first**.
-
-### Create .gitignore
-
-```gitignore
-# Personal configuration - DO NOT COMMIT
-**/*personal*.md
-**/*config*.md
-
-# Skill files with hardcoded values
-# (Users will need to configure these themselves per README)
-```
-
-### Before Committing Skills
-
-**Option A**: Replace hardcoded values with placeholders
-
-In each `SKILL.md`, replace:
-```markdown
-❌ Send the composed brief as a Slack DM to U_REDACTED.
-✅ Send the composed brief as a Slack DM to ${SKILLS_SLACK_USER_ID}.
-
-❌ --to "your.email@example.com" \
-✅ --to "${SKILLS_USER_EMAIL}" \
-
-❌ - `#your-customer-channel-1`
-✅ - Channels from ${SKILLS_CUSTOMER_INSIGHT_CHANNELS}
-```
-
-**Option B**: Keep a local copy outside git
+This repo already has the right `.gitignore` rules. To re-verify:
 
 ```bash
-# Keep your configured skills in ~/.claude/skills/ (NOT in git)
-~/.claude/skills/daily-morning-brief/SKILL.md
+# config.json should be ignored
+git check-ignore -v config.json
+# → .gitignore:2:config.json    config.json
 
-# Commit template versions to git repo
-~/projects/my-skills-repo/daily-morning-brief/SKILL.template.md
+# config.example.json should NOT be ignored
+git check-ignore config.example.json
+# → (no output = tracked)
 ```
 
-### What to Commit
+### What gets committed
 
 ✅ **DO commit:**
-- README.md (this file)
-- SKILL.md files with placeholders or environment variable references
-- Example configuration snippets
+- `README.md`, `CONFIGURATION_GUIDE.md`
+- `config.example.json` (fictional values only)
+- All `SKILL.md` files (now config-driven, no hardcoded personal data)
+- `.gitignore`
 
 ❌ **DON'T commit:**
-- Your personal email address
-- Your Slack user ID
-- Internal Slack channel names
-- Company-specific information
-- Any PII or proprietary data
+- `config.json` (your real values — gitignored)
+- Any `*personal*.md` notes
+- Output files: `competitive-delta-*.md`, `customer-analysis-*.md` (also gitignored)
+
+### Forking workflow
+
+When someone forks this repo:
+1. They clone it.
+2. They `cp config.example.json config.json`.
+3. They edit `config.json` with their own values.
+4. Their `config.json` stays local — never pushed.
+
+If you ever discover that real values leaked into `config.example.json`, treat it as a credentials incident: scrub the file, rotate any exposed identifiers, and force-push the corrected history.
 
 ---
 
 ## 📚 Advanced Usage
 
-### Customizing Channels
+### Customizing channels, news topics, lookback windows
 
-Edit the `SKILLS_CUSTOMER_INSIGHT_CHANNELS` list to monitor your specific channels:
+Edit `config.json` — that's the single source of truth. No `SKILL.md` edits required for normal customization.
 
-```json
-"SKILLS_CUSTOMER_INSIGHT_CHANNELS": "#eng-support,#customer-success,#product-feedback,#field-insights"
-```
+### Multiple competitive baselines
 
-### Customizing News Topics
-
-Edit `daily-morning-brief/SKILL.md` → "News topics" section to track your competitors:
-
-```markdown
-| News topics | Your Product, Competitor A, Competitor B, Industry Keywords |
-```
-
-### Multiple Competitive Baselines
-
-Monitor different competitive landscapes:
+`config.json` only holds one default baseline path, but you can pass any baseline as an argument:
 
 ```bash
-# Monitor AI agent platforms
-/daily-competitive-insights ~/docs/ai-agents-competitive.md
+# Default (from config.json)
+/daily-competitive-insights
 
-# Monitor data platforms
+# Override per run
 /daily-competitive-insights ~/docs/data-platforms-competitive.md
+/daily-competitive-insights ~/docs/dev-tools-competitive.md
 ```
 
-Schedule each separately for different times.
+If you need multiple defaults, schedule each as its own cron job with the path baked into the prompt.
+
+### Disabled email path
+
+Email delivery is currently disabled in all skills (SMTP path is commented out). The values (`user.email`, `paths.send_email_script`) are still loaded so re-enabling later requires only uncommenting the relevant block in each `SKILL.md`.
 
 ---
 
 ## 🐛 Troubleshooting
 
 | Issue | Solution |
-|-------|----------|
-| **"Slack DM failed"** | Verify `SKILLS_SLACK_USER_ID` matches your Slack member ID |
+|---|---|
+| **"Missing ~/.claude/skills/config.json"** | Run `cp config.example.json config.json` and fill in your values |
+| **"Slack DM failed"** | Verify `user.slack_user_id` in `config.json` matches your Slack member ID exactly |
 | **"Email unavailable"** | Connect Gmail in AI Expert Suite settings (requires Google Workspace integration) |
-| **"Permission prompt every run"** | Add the MCP tool to `permissions.allow` in settings.json (see setup section) |
+| **"Permission prompt every run"** | Add the MCP tool to `permissions.allow` in `settings.json` (see Setup Step 2) |
 | **"No calendar events"** | Ensure Google Calendar is connected via AI Expert Suite |
-| **"Channel not found"** | Check channel names in `SKILLS_CUSTOMER_INSIGHT_CHANNELS` (include #) |
-| **Scheduled skills not running** | Check cron jobs with `claude crons` - they auto-expire after 7 days |
+| **"Channel not found"** | Check channel names in `config.daily_customer_insights.channels` (must include `#`) |
+| **Scheduled skills not running** | Check cron jobs with `claude crons` — they auto-expire after 7 days |
+| **Skill picks up wrong baseline** | Update `daily_competitive_insights.default_baseline_path` in `config.json` or pass an explicit path argument |
 
 ---
 
@@ -380,10 +276,11 @@ Schedule each separately for different times.
 
 If you improve these skills or add new ones:
 
-1. **Remove proprietary data** before committing
-2. **Use environment variables** for personal config
-3. **Update README.md** with clear descriptions and examples
-4. **Test with fresh config** to ensure new users can set it up
+1. **Use config-driven values** — never hardcode personal data in `SKILL.md` files
+2. **Update `config.example.json`** with sanitized fictional values for any new settings
+3. **Update `CONFIGURATION_GUIDE.md`** when adding new config keys
+4. **Update README.md** with clear descriptions and examples
+5. **Test with a fresh `config.json`** to ensure new users can set it up
 
 ---
 

@@ -1,12 +1,12 @@
 ---
 name: daily-customer-insights
-description: Compile and send daily customer insights from key Agentforce Slack channels. Aggregates customer feedback, learnings, and open questions from the last 48 hours into a categorized digest sent to Slack. Use for daily customer intelligence briefings.
+description: Compile and send daily customer insights from configured Slack channels. Aggregates customer feedback, learnings, and open questions from the last 48 hours into a categorized digest sent to Slack. Use for daily customer intelligence briefings.
 argument-hint: "[optional: date override or focus area]"
 ---
 
 # Daily Customer Insights
 
-> Compile customer insights from key Agentforce Slack channels and send as a daily digest to Slack.
+> Compile customer insights from configured Slack channels and send as a daily digest to Slack.
 
 ## Usage
 
@@ -18,16 +18,29 @@ argument-hint: "[optional: date override or focus area]"
 
 ## Workflow
 
+### 0. Load Configuration
+
+Before doing any work, read `~/.claude/skills/config.json` and extract:
+- `user.slack_user_id` — Slack DM recipient
+- `user.email` — email recipient (when SMTP enabled)
+- `user.display_name` — used in greetings/messages
+- `paths.send_email_script` — path to email script (when SMTP enabled)
+- `daily_customer_insights.channels` — list of Slack channels to monitor
+- `daily_customer_insights.lookback_hours` — default 48
+- `daily_customer_insights.max_insights_per_category` — default 10
+- `daily_customer_insights.domain` — the product/business domain (e.g., "Agentforce")
+- `daily_customer_insights.product_areas` — list of product-area tags to use
+
+If `config.json` is missing, error out: "Missing ~/.claude/skills/config.json. Copy config.example.json and fill in your values."
+
+For the rest of this document, references to `{{config.user.slack_user_id}}`, `{{config.daily_customer_insights.channels}}`, `{{config.daily_customer_insights.domain}}`, `{{config.daily_customer_insights.product_areas}}`, etc. mean: substitute the value loaded from config.json.
+
 ### 1. Gather Insights from Slack Channels
 
-Search the following channels for messages from the last 48 hours:
-- `#your-customer-channel-1`
-- `#your-customer-channel-2`
-- `#your-customer-channel-3`
-- `#your-customer-channel-4`
+Search every channel in `{{config.daily_customer_insights.channels}}` for messages from the last `{{config.daily_customer_insights.lookback_hours}}` hours.
 
 **Search strategy:**
-1. Use `slack_search_public_and_private` to search each channel for messages from the last 48 hours
+1. Use `slack_search_public_and_private` to search each channel for messages from the last lookback window
 2. For each message, check if there are thread replies with new information
 3. Read full thread context using `slack_read_thread` for messages with replies
 4. Capture permalink URLs for all insights
@@ -44,16 +57,16 @@ Search the following channels for messages from the last 48 hours:
 - Thread updates with new information or resolutions
 
 **Thread monitoring:**
-- If a thread has new replies in the last 48 hours, check if the new replies add net new information (answers, resolutions, workarounds, additional context)
+- If a thread has new replies in the lookback window, check if the new replies add net new information (answers, resolutions, workarounds, additional context)
 - Highlight threads where the latest update materially changes the insight or provides resolution
 
 ### 2. Categorize Insights
 
 Sort insights into two categories:
 
-#### Customer Feedback / Learning (max 10 items)
+#### Customer Feedback / Learning (max `{{config.daily_customer_insights.max_insights_per_category}}` items)
 Insights that teach us something new about:
-- How customers are using Agentforce
+- How customers are using the product (`{{config.daily_customer_insights.domain}}`)
 - What's working well or not working
 - Customer pain points, workarounds, or success patterns
 - Feature gaps or capabilities customers need
@@ -68,7 +81,7 @@ Insights that teach us something new about:
 4. Success stories or positive feedback with replication potential
 5. Technical bugs with workarounds
 
-#### Open Questions (max 10 items)
+#### Open Questions (max `{{config.daily_customer_insights.max_insights_per_category}}` items)
 Questions that need answers:
 - Customer questions awaiting response
 - Technical questions from field teams
@@ -85,7 +98,7 @@ Questions that need answers:
 ### 3. Format Each Insight
 
 For each insight, include:
-- **Product area**: `*[Product Area]*` at the start in bold to identify the Agentforce product area (e.g., Multi-Agent Orchestration, Testing Center, Retrievers, Voice, Copilot, Agent Builder, Observability, Data Cloud, Connectors, etc.)
+- **Product area**: `*[Product Area]*` at the start in bold. Choose from `{{config.daily_customer_insights.product_areas}}`. If unclear, infer from context or use "General".
 - **Channel tag**: `[#channel-name]` to show source
 - **Category indicator**: Emoji to signal type
   - 🔴 Critical/Blocker
@@ -96,11 +109,11 @@ For each insight, include:
 - **Insight summary**: 1-2 sentences capturing the key information
 - **Context**: Customer name, use case, or situation (if available)
 - **Link**: Slack permalink to the thread
-- **Thread update flag**: If new replies in last 48h added material information, note it: _(updated: resolution found)_ or _(updated: workaround posted)_
+- **Thread update flag**: If new replies in the lookback window added material information, note it: _(updated: resolution found)_ or _(updated: workaround posted)_
 
 **Example format:**
 ```
-• 🔴 *Multi-Agent Orchestration* [#af-multi-agent-orchestration] <https://salesforce.slack.com/...|Customer blocked on agent handoff timeout> — Acme Corp hitting 30s timeout when orchestrating 5+ agents; no clear workaround _(updated: eng team investigating)_
+• 🔴 *[Product Area]* [#channel] <https://your-workspace.slack.com/...|Customer blocked on agent handoff timeout> — Acme Corp hitting 30s timeout when orchestrating 5+ agents; no clear workaround _(updated: eng team investigating)_
 ```
 
 ### 4. Compose the Slack Message
@@ -119,9 +132,9 @@ Structure the Slack DM as follows. Use Slack markdown (*bold*, _italic_, bullet 
 • 🔴 *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context]
 • 🟡 *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context]
 • 🟢 *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Brief title/summary]> — [Detail with customer context] _(updated: [new info])_
-• [continue up to 10 items]
+• [continue up to max_insights_per_category items]
 
-> [N] total insights from [N] channels · Covering last 48 hours
+> [N] total insights from [N] channels · Covering last [lookback_hours] hours
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -129,36 +142,33 @@ Structure the Slack DM as follows. Use Slack markdown (*bold*, _italic_, bullet 
 
 • *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Question summary]> — [Context about who's asking and why] _(awaiting response)_
 • *[Product Area]* [#channel] <[SLACK_PERMALINK]|[Question summary]> — [Context about who's asking and why]
-• [continue up to 10 items]
+• [continue up to max_insights_per_category items]
 
 > [N] questions need answers · [N] customer-blocking
 
 ━━━━━━━━━━━━━━━━━━━━━━━━
 
 _Insights compiled from:_
-_• #your-customer-channel-1_
-_• #your-customer-channel-2_
-_• #your-customer-channel-3_
-_• #your-customer-channel-4_
+_• [list each channel from config.daily_customer_insights.channels]_
 ```
 
 ---
 
 ### 5. Send the DM
 
-Send the composed insights digest as a Slack DM to U_REDACTED.
+Send the composed insights digest as a Slack DM to `{{config.user.slack_user_id}}`.
 
 <!--
 ### 6. Send Email
 
 TEMPORARILY DISABLED - SMTP configuration blocked by Google Workspace 2FA restrictions.
-To re-enable: Contact Salesforce IT for SMTP relay configuration or enable app passwords.
+To re-enable: configure SMTP relay or enable app passwords.
 
 Convert the Slack-formatted digest to plain text and send via email:
 
 ```bash
-python3 /Users/YOU/.claude/scripts/send_email.py \
-  --to "your.email@example.com" \
+python3 {{config.paths.send_email_script}} \
+  --to "{{config.user.email}}" \
   --subject "Daily Customer Insights — [WEEKDAY], [DATE]" \
   --body "[Plain text version of insights digest]"
 ```
@@ -177,15 +187,17 @@ After sending Slack DM, confirm to the user in the Claude Code terminal:
 
 ## Configuration
 
-These defaults can be overridden by the user at invocation time:
+All defaults are loaded from `~/.claude/skills/config.json`. To change channels, recipient, lookback window, etc., edit that file.
 
-| Setting | Default |
+| Setting | Config key |
 |---|---|
-| Slack recipient | U_REDACTED (Shiv Ramanna) |
-| Channels | #your-customer-channel-1, #your-customer-channel-2, #your-customer-channel-3, #your-customer-channel-4 |
-| Lookback window | 48 hours |
-| Max insights per category | 10 |
-| Categories | Customer Feedback/Learning, Open Questions |
+| Slack recipient | `user.slack_user_id` |
+| Email recipient | `user.email` |
+| Channels | `daily_customer_insights.channels` |
+| Lookback window | `daily_customer_insights.lookback_hours` |
+| Max insights per category | `daily_customer_insights.max_insights_per_category` |
+| Domain / product name | `daily_customer_insights.domain` |
+| Product-area tags | `daily_customer_insights.product_areas` |
 
 ## Scheduling
 
@@ -196,7 +208,7 @@ This will create a durable cron job that fires the skill each weekday morning.
 
 ## Tips
 
-- **Product area identification**: Identify the specific Agentforce product area for each insight (Multi-Agent Orchestration, Testing Center, Retrievers, Voice, Copilot, Agent Builder, Observability, Data Cloud, Connectors, Query Records, Agent Script, Runtime & Reasoning, etc.). If unclear, infer from context or use "General"
+- **Product area identification**: Use the values in `{{config.daily_customer_insights.product_areas}}`. If unclear, infer from context or use "General".
 - Prioritize insights that are actionable or change our understanding
 - Skip routine status updates or process messages unless they contain real customer insight
 - When threads have new replies, check if they resolve the issue or add meaningful context

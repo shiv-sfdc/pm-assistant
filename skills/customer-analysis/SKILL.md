@@ -27,19 +27,24 @@ argument-hint: "<customer-name>"
 
 ## Workflow
 
+### Load Configuration (before Step 0)
+
+Read `~/.claude/skills/config.json` and extract:
+- `paths.customer_analysis_output_dir` — where to save the final report (used in Step 6)
+- `customer_analysis.default_product_areas` — used to suggest defaults in Step 0
+
+If `config.json` is missing, error out: "Missing ~/.claude/skills/config.json. Copy config.example.json and fill in your values."
+
 ### Step 0: Clarify Product Focus
 
 **Ask the user**:
 ```
 What product or feature area should I focus this analysis on?
 
-Examples:
-- Agentforce / Einstein AI
-- Data Cloud
-- Sales Cloud / Service Cloud
-- Slack
-- Tableau / Analytics
-- Platform / AppExchange
+Default suggestions from config.json (`customer_analysis.default_product_areas`):
+[list each value from config]
+
+You can also specify any other product or feature area.
 
 While I'll center the insights around [PRIMARY PRODUCT], I'll also surface any 
 relevant information about other products for full context.
@@ -463,7 +468,7 @@ Create a comprehensive markdown report with the following structure:
 
 Save the report to a logical location:
 
-**Default path**: `~/Documents/Work/CompetitiveAnalysis/customer-analysis-[customer-name-slug]-[YYYY-MM-DD].md`
+**Default path**: `{{config.paths.customer_analysis_output_dir}}/customer-analysis-[customer-name-slug]-[YYYY-MM-DD].md`
 
 **Naming convention**: 
 - Lowercase, hyphen-separated
@@ -578,9 +583,9 @@ Search for variations:
 → [Generates report centered on Service Cloud]
 
 # After daily-customer-insights alert
-# daily-customer-insights found: "Acme Corp mentioned 'critical bug' in #agentforce"
+# daily-customer-insights found: "Acme Corp mentioned 'critical bug' in [#some-channel]"
 /customer-analysis "Acme Corp"
-→ Focus on: Agentforce
+→ Focus on: [PRIMARY PRODUCT from config.customer_analysis.default_product_areas]
 → [Deep-dive reveals full context of the issue]
 ```
 

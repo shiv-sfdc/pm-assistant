@@ -1,8 +1,7 @@
 # Personal configuration files - DO NOT COMMIT
-*personal*.md
-*config*.md
-.env
 config.json
+*personal*.md
+.env
 
 # OS files
 .DS_Store
@@ -16,9 +15,3 @@ Thumbs.db
 # Output files from skills
 competitive-delta-*.md
 customer-analysis-*.md
-
-# If you have hardcoded personal values in SKILL.md files,
-# you may want to ignore specific skills and maintain template versions:
-# daily-morning-brief/SKILL.md
-# daily-customer-insights/SKILL.md
-# daily-competitive-insights/SKILL.md

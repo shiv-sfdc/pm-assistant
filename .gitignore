@@ -33,5 +33,14 @@ push-to-both-repos.sh
 sync-to-shivramanna.sh
 sync-both-repos.sh
 
+# Secrets — never commit
+smtp_credentials.env
+*.env
+
+# Local runtime state
+.daily-skills-lastrun
+security_warnings_state_*.txt
+logs/
+
 # Misc
 SCRIPT_INSTRUCTIONS.md

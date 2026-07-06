@@ -71,6 +71,12 @@ Search for news from the last `{{config.daily_competitive_insights.research_look
 
 **Research tips**:
 - Use WebFetch to check competitor blogs directly (more reliable than search engine blocks)
+- For news-aggregator sweeps across competitors, use the helper script in ONE call — do NOT hand-roll `for q in ...; do curl ...` or `declare -A` loops (they aren't preapproved and will prompt):
+  ```bash
+  python3 ~/.claude/scripts/fetch_news.py --when 2d --max 4 \
+    "ServiceNow AI agent" "Microsoft Copilot Studio agent" "AWS Bedrock AgentCore" "Salesforce Agentforce"
+  ```
+  Pass one quoted query per tracked competitor. It prints `TITLE: / LINK: / DATE: / SOURCE:` blocks per `=== QUERY: ... ===`.
 - Check multiple sources to corroborate findings
 - Track publication dates carefully (only capture genuinely new information)
 - Note when research sources are inaccessible (document in delta report)
@@ -161,10 +167,10 @@ If PPTX or Keynote files exist (same base path with `.pptx` or `.key` extensions
   - Preserve branding (colors, fonts, layout)
   - 16:9 widescreen format (13.33" x 7.5")
 
-**Keynote conversion** (optional):
-- Convert PPTX to Keynote via AppleScript/Keynote automation
-- May fail if Keynote not running; document in notification
-- Not critical if PPTX is available
+**Keynote conversion** — DISABLED (per user preference, June 2026):
+- Do NOT convert the PPTX to Keynote (`.key`). Skip this step entirely.
+- The PPTX is the deliverable; leave any existing `.key` file untouched and do not regenerate it.
+- Do not list `.key` in the Slack confirmation.
 
 ### 5. Send Slack Notification
 
@@ -179,7 +185,6 @@ Send the full delta report formatted for Slack (use *bold* for headers, bullets 
 • [baseline-filename].md (updated)
 • [baseline-filename].pdf (regenerated)
 • [baseline-filename].pptx (regenerated)
-• [baseline-filename].key (regenerated if successful)
 ```
 
 **If there were NO 🔴 or 🟡 updates** (only ⚪):
@@ -313,7 +318,8 @@ After running, the skill generates/updates:
 - `[baseline-filename].md` — Updated baseline (only if 🔴/🟡 updates)
 - `[baseline-filename].pdf` — Regenerated PDF (only if 🔴/🟡 updates)
 - `[baseline-filename].pptx` — Regenerated presentation (only if 🔴/🟡 updates)
-- `[baseline-filename].key` — Regenerated Keynote (optional, only if 🔴/🟡 updates)
+
+(Keynote `.key` generation is disabled per user preference — see section 4c.)
 
 All files are saved in the same directory as the baseline file.
 

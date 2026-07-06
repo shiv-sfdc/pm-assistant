@@ -106,9 +106,13 @@ Summarize each email in 1 line max — never quote full body. If Gmail is not co
 - Filter for relevance to topics in `{{config.daily_morning_brief.news_topics}}`
 - Max `{{config.daily_morning_brief.max_news_items}}` items — signal only, no filler
 - **Search strategy:**
-  - Use Google News RSS feeds via curl: `https://news.google.com/rss/search?q=QUERY+when:2d&hl=en-US&gl=US&ceid=US:en`
-  - Use the search queries from `{{config.daily_morning_brief.news_search_queries}}`
-  - Parse RSS XML to extract: title, link, pubDate, source
+  - Fetch all queries in one shot with the helper script (no ad-hoc shell loops — this keeps the call preapproved and handles the corporate CA bundle):
+    ```bash
+    python3 ~/.claude/scripts/fetch_news.py --when 2d --max 4 \
+      "Claude AI" "Anthropic" "OpenAI" "Google Gemini" "AI agents" "Agentforce Salesforce" "ServiceNow Agent"
+    ```
+    Pass the queries from `{{config.daily_morning_brief.news_search_queries}}` as arguments (one quoted arg each). Set `--when` from `news_lookback_hours` (48h → `2d`).
+  - The script prints `TITLE: / LINK: / DATE: / SOURCE:` blocks grouped under `=== QUERY: ... ===`. Parse those directly — no curl or XML handling needed.
   - Filter by relevance and deduplicate across queries
   - Prioritize: product launches, major features, partnerships, research papers, competitive moves
   - Skip: opinion pieces, minor updates, marketing fluff
@@ -119,9 +123,13 @@ Summarize each email in 1 line max — never quote full body. If Gmail is not co
 
 Structure the Slack DM as follows. Use Slack markdown (*bold*, _italic_, bullet points). Keep each section tight — the brief should be readable in under 2 minutes.
 
+The first line is a title with a run timestamp: `📋 *Daily Morning Brief* · _generated [WEEKDAY], [DATE] at [HH:MM AM/PM TZ]_`. Use the actual wall-clock time the skill runs (e.g. via `date "+%A, %B %-d, %Y at %-I:%M %p %Z"`), not a placeholder.
+
 ---
 
 ```
+📋 *Daily Morning Brief* · _generated [WEEKDAY], [DATE] at [HH:MM AM/PM TZ]_
+
 🌅 *Good morning, [config.user.display_name] — [WEEKDAY], [DATE]*
 
 ━━━━━━━━━━━━━━━━━━━━━━━━

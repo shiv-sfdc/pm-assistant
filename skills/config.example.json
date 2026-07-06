@@ -67,5 +67,46 @@
       "Pulse / Workflow Builder",
       "Pulse / Voice"
     ]
+  },
+  "daily_funding_radar": {
+    "_comment": "Tracks recently-funded startups (default AI/ML focus). lookback_hours defines the news window; archive_dir is where dated digests are saved. Tune the queries and sectors to your investment/competitive interests.",
+    "lookback_hours": 48,
+    "max_deals_per_category": 12,
+    "archive_dir": "/Users/jane/Documents/Work/Pulse-Competitive/funding-radar",
+    "funding_search_queries": [
+      "AI startup raises seed funding",
+      "AI startup Series A funding",
+      "AI startup Series B funding",
+      "AI agent startup funding round",
+      "generative AI startup raises",
+      "AI infrastructure startup funding",
+      "enterprise AI startup venture funding",
+      "AI startup backed by a16z Sequoia",
+      "AI startup emerges from stealth funding",
+      "AI coding agent startup raises",
+      "vertical AI startup funding healthcare fintech legal",
+      "AI data / observability startup funding"
+    ],
+    "focus_sectors": [
+      "AI Agents / Agentic",
+      "AI Infrastructure & Compute",
+      "Foundation Models / LLMs",
+      "Developer Tools / Coding Agents",
+      "Enterprise / Vertical SaaS AI",
+      "Data / Retrieval / Observability",
+      "AI Security & Governance",
+      "Robotics / Physical AI",
+      "Voice / Multimodal",
+      "Other AI"
+    ],
+    "min_round_stages": [
+      "Pre-seed",
+      "Seed",
+      "Series A",
+      "Series B",
+      "Series C+",
+      "Grant / Angel",
+      "Stealth / Undisclosed"
+    ]
   }
 }
